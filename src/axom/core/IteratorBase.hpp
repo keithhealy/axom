@@ -9,14 +9,10 @@
  * \brief Contains iterator base classes
  */
 
-#ifndef SLAM_ITERBASE_H_
-#define SLAM_ITERBASE_H_
-
-#include "axom/slam/Set.hpp"
+#ifndef AXOM_ITERBASE_HPP_
+#define AXOM_ITERBASE_HPP_
 
 namespace axom
-{
-namespace slam
 {
 
 /**
@@ -174,7 +170,6 @@ protected:
   PosType m_pos;
 };
 
-} // end namespace slam
 } // end namespace axom
 
-#endif //  SLAM_ITERATOR_BASE_H_
+#endif //  AXOM_ITERBASE_HPP_
