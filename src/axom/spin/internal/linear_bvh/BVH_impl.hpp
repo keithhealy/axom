@@ -416,6 +416,43 @@ int BVH< NDIMS, ExecSpace, FloatType >::build()
   // STEP 4: emit the BVH
   lbvh::emit_bvh< ExecSpace >( radix_tree, m_bvh );
 
+  #include <iostream>
+  #include <fstream>
+  #include <stdlib.h>
+  #include <time.h>
+  #include <typeinfo>
+  
+  srand(time(NULL));
+  std::ofstream myfile;
+  myfile.open ("example.txt", std::ofstream::trunc);
+  myfile << "Random number for sanity check is " << rand() % 1000 << "\n";
+
+  for (int i = 0 ; i < (numBoxes - 1) * 4 ; i++)
+  {
+    if ( i % 4 != 3 || i == 0 )
+    {
+      myfile << "IN BVH: m_bvh inner node " << i << " is " << m_bvh.m_inner_nodes[i] << "\n";    
+    }
+    else 
+    {
+       int32 test1;
+       int32 test2;
+       int32 test3;
+       int32 test4;
+       std::memcpy(&test1, &(m_bvh.m_inner_nodes[i][0]), sizeof(int32));
+       std::memcpy(&test2, &(m_bvh.m_inner_nodes[i][1]), sizeof(int32));
+       std::memcpy(&test3, &(m_bvh.m_inner_nodes[i][2]), sizeof(int32));
+       std::memcpy(&test4, &(m_bvh.m_inner_nodes[i][3]), sizeof(int32));
+
+       myfile << "IN BVH ID's: m_bvh inner node " << i << " is " << "[" << test1 << ", " 
+                     << test2 << ", "
+                     << test3 << ", "
+                     << test4 << "]" << "\n";
+       // SLIC_INFO("ID has type " << typeid(m_bvh.m_leaf_nodes[0]).name() );
+    } 
+  }
+  myfile.close();
+  
   radix_tree.deallocate();
 
   // STEP 5: deallocate boxesptr if user supplied a single box

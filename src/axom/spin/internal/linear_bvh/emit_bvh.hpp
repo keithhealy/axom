@@ -133,6 +133,8 @@ void emit_bvh( RadixTree<FloatType, 3>& data,
       // memcopy so we do not truncate the ints
       memcpy(&vec4[0], &lchild, isize);
       memcpy(&vec4[1], &rchild, isize);
+      memcpy(&vec4[2], &size, isize);
+      memcpy(&vec4[3], &inner_size, isize);
       flat_ptr[out_offset + 3] = vec4;
     } );
   );
