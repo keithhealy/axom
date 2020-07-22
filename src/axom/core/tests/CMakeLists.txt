@@ -15,6 +15,7 @@ set(gtest_utils_tests
    core_execution_for_all.cpp
    core_memory_management.cpp
    core_array.cpp
+   core_mcarray.cpp
    core_stack_array.cpp
 
    utils_TaskTimer.cpp

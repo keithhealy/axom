@@ -3,7 +3,7 @@
 //
 // SPDX-License-Identifier: (BSD-3-Clause)
 
-#include "axom/mint/core/Array.hpp"           /* for axom::mint::Array */
+#include "axom/core/MCArray.hpp"              /* for axom::MCArray */
 #include "axom/core/memory_management.hpp"    /* for alloc() and free() */
 
 #include "gtest/gtest.h"                      /* for TEST and EXPECT_* macros */
@@ -14,24 +14,20 @@
 namespace axom
 {
 
-namespace mint
-{
-
-
 const char IGNORE_OUTPUT[] = ".*";
 
 namespace internal
 {
 
 /*!
- * \brief Calculate the new capacity for an Array given an increase in the
+ * \brief Calculate the new capacity for an MCArray given an increase in the
  *  size.
- * \param [in] v, the Array in question.
+ * \param [in] v, the MCArray in question.
  * \param [in] increase, the amount the size will increase by
  * \return the new capacity.
  */
 template < typename T >
-IndexType calc_new_capacity( Array< T > & v, IndexType increase )
+IndexType calc_new_capacity( MCArray< T > & v, IndexType increase )
 {
   IndexType new_num_tuples = v.size() + increase;
   if ( new_num_tuples > v.capacity() )
@@ -43,13 +39,13 @@ IndexType calc_new_capacity( Array< T > & v, IndexType increase )
 }
 
 /*!
- * \brief Check if two Arrays are equivalent. Does not check the resize ratio.
- * \param [in] lhs, the first Array to compare.
- * \param [in] rhs, the second Array to compare.
+ * \brief Check if two MCArrays are equivalent. Does not check the resize ratio.
+ * \param [in] lhs, the first MCArray to compare.
+ * \param [in] rhs, the second MCArray to compare.
  * \return the new capacity.
  */
 template< typename T >
-void check_copy( const Array< T >& lhs, const Array< T >& rhs )
+void check_copy( const MCArray< T >& lhs, const MCArray< T >& rhs )
 {
   EXPECT_EQ( lhs.size(), rhs.size() );
   EXPECT_EQ( lhs.numComponents(), rhs.numComponents() );
@@ -61,11 +57,11 @@ void check_copy( const Array< T >& lhs, const Array< T >& rhs )
 }
 
 /*!
- * \brief Check that the storage of an Array is working properly.
- * \param [in] v the Array to check.
+ * \brief Check that the storage of an MCArray is working properly.
+ * \param [in] v the MCArray to check.
  */
 template < typename T >
-void check_storage( Array< T >& v )
+void check_storage( MCArray< T >& v )
 {
   EXPECT_TRUE( v.empty() );
   EXPECT_EQ( v.size(), 0 );
@@ -97,7 +93,7 @@ void check_storage( Array< T >& v )
     tuple = nullptr;
   }
 
-  /* Check the array metadata. */
+  /* Check the MCArray metadata. */
   EXPECT_TRUE( !v.empty() );
   EXPECT_EQ( v.size(), capacity / 2 );
   EXPECT_EQ( v.capacity(), capacity );
@@ -126,13 +122,13 @@ void check_storage( Array< T >& v )
     tuple = nullptr;
   }
 
-  /* Check the array metadata. */
+  /* Check the MCArray metadata. */
   EXPECT_TRUE( !v.empty() );
   EXPECT_EQ( v.size(), capacity );
   EXPECT_EQ( v.capacity(), capacity );
   EXPECT_EQ( v.getData(), data_ptr );
 
-  /* Check the array data using the () and [] operators and the raw pointer. */
+  /* Check the MCArray data using the () and [] operators and the raw pointer. */
   for ( IndexType i = 0 ; i < capacity ; ++i )
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -143,7 +139,7 @@ void check_storage( Array< T >& v )
     }
   }
 
-  /* Set the array data to new values using the () operator. */
+  /* Set the MCArray data to new values using the () operator. */
   for ( IndexType i = 0 ; i < capacity ; ++i )
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -152,7 +148,7 @@ void check_storage( Array< T >& v )
     }
   }
 
-  /* Check the array data using the () and [] operators and the raw pointer. */
+  /* Check the MCArray data using the () and [] operators and the raw pointer. */
   for ( IndexType i = 0 ; i < capacity ; ++i )
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -163,7 +159,7 @@ void check_storage( Array< T >& v )
     }
   }
 
-  /* Check the array metadata. */
+  /* Check the MCArray metadata. */
   EXPECT_TRUE( !v.empty() );
   EXPECT_EQ( v.size(), capacity );
   EXPECT_EQ( v.capacity(), capacity );
@@ -172,10 +168,10 @@ void check_storage( Array< T >& v )
 
 /*!
  * \brief Check that the fill method is working properly.
- * \param [in] v the Array to check.
+ * \param [in] v the MCArray to check.
  */
 template < typename T >
-void check_fill( Array< T >& v )
+void check_fill( MCArray< T >& v )
 {
   constexpr T MAGIC_NUM_0 = 55;
   constexpr T MAGIC_NUM_1 = 6834;
@@ -185,7 +181,7 @@ void check_fill( Array< T >& v )
   const double ratio = v.getResizeRatio();
   const T* const data_ptr = v.getData();
 
-  /* Fill the Array with MAGIC_NUM_0. */
+  /* Fill the MCArray with MAGIC_NUM_0. */
   v.fill( MAGIC_NUM_0 );
 
   /* Check the meta data. */
@@ -204,7 +200,7 @@ void check_fill( Array< T >& v )
     }
   }
 
-  /* Fill the Array with MAGIC_NUM_1. */
+  /* Fill the MCArray with MAGIC_NUM_1. */
   v.fill( MAGIC_NUM_1 );
 
   /* Check the meta data. */
@@ -226,10 +222,10 @@ void check_fill( Array< T >& v )
 
 /*!
  * \brief Check that the set method is working properly.
- * \param [in] v the Array to check.
+ * \param [in] v the MCArray to check.
  */
 template < typename T >
-void check_set( Array< T >& v )
+void check_set( MCArray< T >& v )
 {
   constexpr T ZERO_VAL = 0;
   const IndexType capacity = v.capacity();
@@ -238,7 +234,7 @@ void check_set( Array< T >& v )
   const double ratio = v.getResizeRatio();
   const T* const data_ptr = v.getData();
 
-  /* Allocate a buffer half the size of the array. Fill it up with sequential
+  /* Allocate a buffer half the size of the MCArray. Fill it up with sequential
    * values. */
   const IndexType buffer_size = size / 2;
   T* buffer = allocate<T>( buffer_size * num_components );
@@ -247,21 +243,21 @@ void check_set( Array< T >& v )
     buffer[ i ] = i;
   }
 
-  /* Set all the values in the array to zero. */
+  /* Set all the values in the MCArray to zero. */
   v.fill( ZERO_VAL );
 
-  /* Set the first half of the tuples in the array to the sequential values in
+  /* Set the first half of the tuples in the MCArray to the sequential values in
    * buffer. */
   v.set( buffer, buffer_size, 0 );
 
-  /* Check the array metadata. */
+  /* Check the MCArray metadata. */
   EXPECT_EQ( capacity, v.capacity() );
   EXPECT_EQ( size, v.size() );
   EXPECT_EQ( num_components, v.numComponents() );
   EXPECT_EQ( ratio, v.getResizeRatio() );
   EXPECT_EQ( data_ptr, v.getData() );
 
-  /* Check that the first half of the tuples in the array are equivalent to
+  /* Check that the first half of the tuples in the MCArray are equivalent to
    * those in buffer. */
   for ( IndexType i = 0 ; i < buffer_size ; ++i )
   {
@@ -271,7 +267,7 @@ void check_set( Array< T >& v )
     }
   }
 
-  /* Check that the second half of the tuples in the array are all zero. */
+  /* Check that the second half of the tuples in the MCArray are all zero. */
   for ( IndexType i = buffer_size ; i < size ; ++i )
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -286,18 +282,18 @@ void check_set( Array< T >& v )
     buffer[ i ] = i + buffer_size * num_components;
   }
 
-  /* Set the second half of the tuples in the array to the new sequential values
+  /* Set the second half of the tuples in the MCArray to the new sequential values
    * in buffer. */
   v.set( buffer, buffer_size, buffer_size );
 
-  /* Check the array metadata. */
+  /* Check the MCArray metadata. */
   EXPECT_EQ( capacity, v.capacity() );
   EXPECT_EQ( size, v.size() );
   EXPECT_EQ( num_components, v.numComponents() );
   EXPECT_EQ( ratio, v.getResizeRatio() );
   EXPECT_EQ( data_ptr, v.getData() );
 
-  /* Check that all the tuples in the array now hold sequential values. */
+  /* Check that all the tuples in the MCArray now hold sequential values. */
   for ( IndexType i = 0 ; i < 2 * buffer_size ; ++i )
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -310,13 +306,13 @@ void check_set( Array< T >& v )
 }
 
 /*!
- * \brief Check that the resizing of an Array is working properly.
- * \param [in] v the Array to check.
+ * \brief Check that the resizing of an MCArray is working properly.
+ * \param [in] v the MCArray to check.
  */
 template < typename T >
-void check_resize( Array< T >& v )
+void check_resize( MCArray< T >& v )
 {
-  /* Resize the array up to the capacity */
+  /* Resize the MCArray up to the capacity */
   IndexType capacity = v.capacity();
   v.resize( capacity );
   IndexType size = capacity;
@@ -507,13 +503,13 @@ void check_resize( Array< T >& v )
 }
 
 /*!
- * \brief Check that the insertion into an Array is working properly.
- * \param [in] v the Array to check.
+ * \brief Check that the insertion into an MCArray is working properly.
+ * \param [in] v the MCArray to check.
  */
 template < typename T >
-void check_insert( Array< T >& v )
+void check_insert( MCArray< T >& v )
 {
-  /* Resize the array up to the capacity */
+  /* Resize the MCArray up to the capacity */
   IndexType capacity = v.capacity();
   v.resize( capacity );
   IndexType size = capacity;
@@ -591,7 +587,7 @@ void check_insert( Array< T >& v )
     data_ptr[ i ] = i + num_components * n_insert_front;
   }
 
-  /* Insert into the front of the Array. */
+  /* Insert into the front of the MCArray. */
   for ( IndexType i = n_insert_front - 1 ; i >= 0 ; i--)
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -623,14 +619,14 @@ void check_insert( Array< T >& v )
 
 /*!
  * \brief Check that the emplace method is working properly.
- * \param [in] v the Array to check.
+ * \param [in] v the MCArray to check.
  */
 template < typename T >
-void check_emplace( Array< T >& v )
+void check_emplace( MCArray< T >& v )
 {
   constexpr T MAGIC_NUM = 52706;
 
-  /* Resize the array up to the capacity */
+  /* Resize the MCArray up to the capacity */
   IndexType capacity = v.capacity();
   v.resize( capacity );
   IndexType size = capacity;
@@ -647,12 +643,12 @@ void check_emplace( Array< T >& v )
     }
   }
 
-  /* Emplace 1 tuple at the end of the array with the default value,
+  /* Emplace 1 tuple at the end of the MCArray with the default value,
    * should resize. */
   capacity = calc_new_capacity( v, 1 );
   v.emplace( 1, v.size() );
 
-  /* Emplace 9 tuples at the end of the array with MAGIC_NUM. */
+  /* Emplace 9 tuples at the end of the MCArray with MAGIC_NUM. */
   capacity = calc_new_capacity( v, 9 );
   v.emplace( 9, v.size(), MAGIC_NUM );
   size += 10;
@@ -683,11 +679,11 @@ void check_emplace( Array< T >& v )
     }
   }
 
-  /* Emplace 10 tuples at the beginning of the array with MAGIC_NUM. */
+  /* Emplace 10 tuples at the beginning of the MCArray with MAGIC_NUM. */
   capacity = calc_new_capacity( v, 9 );
   v.emplace( 9, 0, MAGIC_NUM );
 
-  /* Emplace 1 tuple at the beginning of the array with the default value. */
+  /* Emplace 1 tuple at the beginning of the MCArray with the default value. */
   capacity = calc_new_capacity( v, 1 );
   v.emplace( 1, 0 );
   size += 10;
@@ -733,12 +729,12 @@ void check_emplace( Array< T >& v )
     }
   }
 
-  /* Emplace 9 tuples in the middle of the array with MAGIC_NUM. */
+  /* Emplace 9 tuples in the middle of the MCArray with MAGIC_NUM. */
   IndexType middle = size / 2;
   capacity = calc_new_capacity( v, 9 );
   v.emplace( 9, middle, MAGIC_NUM );
 
-  /* Emplace 1 tuple in the middle of the array with the default value. */
+  /* Emplace 1 tuple in the middle of the MCArray with the default value. */
   capacity = calc_new_capacity( v, 1 );
   v.emplace( 1, middle );
   size += 10;
@@ -809,15 +805,15 @@ void check_emplace( Array< T >& v )
 }
 
 /*!
- * \brief Check an external array for defects.
- * \param [in] v the external array to check.
+ * \brief Check an external MCArray for defects.
+ * \param [in] v the external MCArray to check.
  */
 template< typename T >
-void check_external( Array< T >& v )
+void check_external( MCArray< T >& v )
 {
   ASSERT_TRUE( v.isExternal() );
 
-  /* Check that the array is full. */
+  /* Check that the MCArray is full. */
   ASSERT_EQ( v.size(), v.capacity() );
 
   const IndexType size = v.size();
@@ -825,7 +821,7 @@ void check_external( Array< T >& v )
   const IndexType num_values = size * num_components;
   T* const data_ptr = v.getData();
 
-  /* Set the tuples in the array. */
+  /* Set the tuples in the MCArray. */
   for ( IndexType i = 0 ; i < size ; ++i )
   {
     for ( IndexType j = 0 ; j < num_components ; ++j )
@@ -862,7 +858,7 @@ void check_external( Array< T >& v )
   EXPECT_EQ( size, v.capacity() );
   EXPECT_EQ( data_ptr, v.getData() );
 
-  /* Since the array is full all of the following calls should require a
+  /* Since the MCArray is full all of the following calls should require a
    * reallocation and cause a fatal error. */
   T* tuple = allocate< T >( num_components );
   EXPECT_DEATH_IF_SUPPORTED( v.append( tuple, 1 ), IGNORE_OUTPUT );
@@ -880,7 +876,7 @@ void check_external( Array< T >& v )
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-TEST( core_array, checkStorage )
+TEST( core_mcarray, checkStorage )
 {
   constexpr IndexType ZERO_VAL = 0;
 
@@ -888,50 +884,50 @@ TEST( core_array, checkStorage )
   {
     for ( IndexType n_components = 1 ; n_components <= 4 ; n_components++ )
     {
-      Array< int > v_int( ZERO_VAL, n_components, capacity );
+      MCArray< int > v_int( ZERO_VAL, n_components, capacity );
       internal::check_storage( v_int );
 
-      Array< double > v_double( ZERO_VAL, n_components, capacity );
+      MCArray< double > v_double( ZERO_VAL, n_components, capacity );
       internal::check_storage( v_double );
     }
   }
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array, checkFill )
+TEST( core_mcarray, checkFill )
 {
   for ( IndexType capacity = 2 ; capacity < 512 ; capacity *= 2 )
   {
     IndexType size = capacity / 2;
     for ( IndexType n_components = 1 ; n_components <= 4 ; n_components++ )
     {
-      Array< int > v_int( size, n_components, capacity );
+      MCArray< int > v_int( size, n_components, capacity );
       internal::check_fill( v_int );
 
-      Array< double > v_double( size, n_components, capacity );
+      MCArray< double > v_double( size, n_components, capacity );
       internal::check_fill( v_double );
     }
   }
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array, checkSet )
+TEST( core_mcarray, checkSet )
 {
   for ( IndexType size = 2 ; size < 512 ; size *= 2 )
   {
     for ( IndexType n_components = 1 ; n_components <= 4 ; n_components++ )
     {
-      Array< int > v_int( size, n_components );
+      MCArray< int > v_int( size, n_components );
       internal::check_set( v_int );
 
-      Array< double > v_double( size, n_components );
+      MCArray< double > v_double( size, n_components );
       internal::check_set( v_double );
     }
   }
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array, checkResize )
+TEST( core_mcarray, checkResize )
 {
   constexpr IndexType ZERO_VAL = 0;
 
@@ -941,11 +937,11 @@ TEST( core_array, checkResize )
     {
       for ( IndexType n_components = 1 ; n_components <= 4 ; n_components++ )
       {
-        Array< int > v_int( ZERO_VAL, n_components, capacity );
+        MCArray< int > v_int( ZERO_VAL, n_components, capacity );
         v_int.setResizeRatio( ratio );
         internal::check_resize( v_int );
 
-        Array< double > v_double( ZERO_VAL, n_components, capacity );
+        MCArray< double > v_double( ZERO_VAL, n_components, capacity );
         v_double.setResizeRatio( ratio );
         internal::check_resize( v_double );
       }
@@ -954,16 +950,16 @@ TEST( core_array, checkResize )
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array_DeathTest, checkResize )
+TEST( core_mcarray_DeathTest, checkResize )
 {
   /* Resizing isn't allowed with a ratio less than 1.0. */
-  Array< int > v_int( axom::mint::internal::ZERO, 1, 100 );
+  MCArray< int > v_int( axom::internal::ZERO, 1, 100 );
   v_int.setResizeRatio( 0.99 );
   EXPECT_DEATH_IF_SUPPORTED( internal::check_resize( v_int ), IGNORE_OUTPUT );
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array, checkInsert )
+TEST( core_mcarray, checkInsert )
 {
   constexpr IndexType ZERO_VAL = 0;
 
@@ -973,11 +969,11 @@ TEST( core_array, checkInsert )
     {
       for ( IndexType n_components = 1 ; n_components <= 3 ; n_components++ )
       {
-        Array< int > v_int( ZERO_VAL, n_components, capacity );
+        MCArray< int > v_int( ZERO_VAL, n_components, capacity );
         v_int.setResizeRatio( ratio );
         internal::check_insert( v_int );
 
-        Array< double > v_double( ZERO_VAL, n_components, capacity );
+        MCArray< double > v_double( ZERO_VAL, n_components, capacity );
         v_double.setResizeRatio( ratio );
         internal::check_insert( v_double );
       }
@@ -986,7 +982,7 @@ TEST( core_array, checkInsert )
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array, checkEmplace )
+TEST( core_mcarray, checkEmplace )
 {
   constexpr IndexType ZERO_VAL = 0;
 
@@ -996,11 +992,11 @@ TEST( core_array, checkEmplace )
     {
       for ( IndexType n_components = 1 ; n_components <= 3 ; n_components++ )
       {
-        Array< int > v_int( ZERO_VAL, n_components, capacity );
+        MCArray< int > v_int( ZERO_VAL, n_components, capacity );
         v_int.setResizeRatio( ratio );
         internal::check_emplace( v_int );
 
-        Array< double > v_double( ZERO_VAL, n_components, capacity );
+        MCArray< double > v_double( ZERO_VAL, n_components, capacity );
         v_double.setResizeRatio( ratio );
         internal::check_emplace( v_double );
       }
@@ -1009,7 +1005,7 @@ TEST( core_array, checkEmplace )
 }
 
 //------------------------------------------------------------------------------
-TEST( core_array_DeathTest, checkExternal )
+TEST( core_mcarray_DeathTest, checkExternal )
 {
   constexpr double MAGIC_NUM = 5683578.8;
   constexpr IndexType MAX_SIZE = 256;
@@ -1030,11 +1026,11 @@ TEST( core_array_DeathTest, checkExternal )
     for ( IndexType n_comp = 1 ; n_comp <= MAX_COMPONENTS ; n_comp++ )
     {
 
-      Array< int > v_int( buffer.ints, size, n_comp );
+      MCArray< int > v_int( buffer.ints, size, n_comp );
       EXPECT_EQ( v_int.getData(), buffer.ints );
       internal::check_external( v_int );
 
-      Array< double > v_double( buffer.doubles, size, n_comp );
+      MCArray< double > v_double( buffer.doubles, size, n_comp );
       EXPECT_EQ( v_double.getData(), buffer.doubles );
       internal::check_external( v_double );
 
@@ -1050,7 +1046,6 @@ TEST( core_array_DeathTest, checkExternal )
   }
 }
 
-} /* end namespace mint */
 } /* end namespace axom */
 
 //------------------------------------------------------------------------------
