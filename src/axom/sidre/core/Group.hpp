@@ -341,7 +341,7 @@ public:
    *
    * This method requires that all groups in the path exist if a path is given.
    *
-   * If no such View exists, nullptr is returned.
+   * If no such View exists, nullptr is returned and a warning is displayed.
    */
   View* getView( const std::string& path );
 
@@ -350,21 +350,21 @@ public:
    *
    * This method requires that all Groups in the path exist if a path is given.
    *
-   * If no such View exists, nullptr is returned.
+   * If no such View exists, nullptr is returned and a warning is displayed.
    */
   const View* getView( const std::string& path ) const;
 
   /*!
    * \brief Return pointer to non-const View with given index.
    *
-   * If no such View exists, nullptr is returned.
+   * If no such View exists, nullptr is returned and a warning is displayed.
    */
   View* getView( IndexType idx );
 
   /*!
    * \brief Return pointer to const View with given index.
    *
-   * If no such View exists, nullptr is returned.
+   * If no such View exists, nullptr is returned and a warning is displayed.
    */
   const View* getView( IndexType idx ) const;
 
@@ -910,7 +910,7 @@ public:
    *
    * This method requires that all Groups in the path exist if a path is given.
    *
-   * If no such Group exists, nullptr is returned.
+   * If no such Group exists, nullptr is returned and a warning is displayed.
    */
   Group* getGroup( const std::string& path );
 
@@ -919,21 +919,21 @@ public:
    *
    * This method requires that all Groups in the path exist if a path is given.
    *
-   * If no such Group exists, nullptr is returned.
+   * If no such Group exists, nullptr is returned and a warning is displayed.
    */
   Group const* getGroup( const std::string& path ) const;
 
   /*!
    * \brief Return pointer to non-const immediate child Group with given index.
    *
-   * If no such Group exists, nullptr is returned.
+   * If no such Group exists, nullptr is returned and a warning is displayed.
    */
   Group* getGroup( IndexType idx );
 
   /*!
    * \brief Return pointer to const immediate child Group with given index.
    *
-   * If no such Group exists, nullptr is returned.
+   * If no such Group exists, nullptr is returned and a warning is displayed.
    */
   const Group* getGroup( IndexType idx ) const;
 
