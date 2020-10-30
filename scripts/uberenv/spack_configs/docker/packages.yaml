@@ -76,11 +76,6 @@ packages:
     externals:
     - spec: graphviz
       prefix: /usr/bin/
-  raja:
-    buildable: false
-    externals:
-    - spec: raja
-      prefix: /usr/local/share/raja/cmake
 # Globally lock in version of CMake
   cmake:
     version: [3.10.1]
